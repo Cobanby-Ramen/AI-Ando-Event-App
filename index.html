@@ -9,7 +9,7 @@
     <style>
         body {
             font-family: 'Press Start 2P', monospace;
-            background-color: #030712;
+            background-color: #020617;
             color: #ffffff;
             touch-action: manipulation;
             user-select: none;
@@ -17,39 +17,39 @@
         }
         .arcade-border {
             border: 3px solid #06b6d4;
-            box-shadow: 0 0 20px rgba(6, 182, 212, 0.4), inset 0 0 15px rgba(6, 182, 212, 0.2);
+            box-shadow: 0 0 25px rgba(6, 182, 212, 0.4), inset 0 0 15px rgba(6, 182, 212, 0.2);
             transition: all 0.3s ease;
         }
         .fever-border {
             border: 4px solid #ec4899 !important;
-            box-shadow: 0 0 35px #ec4899, inset 0 0 25px #ec4899 !important;
-            animation: feverPulse 0.4s infinite alternate;
+            box-shadow: 0 0 45px #ec4899, inset 0 0 30px #ec4899 !important;
+            animation: feverPulse 0.35s infinite alternate;
         }
         @keyframes feverPulse {
-            0% { box-shadow: 0 0 20px #ec4899, inset 0 0 10px #ec4899; }
-            100% { box-shadow: 0 0 40px #f43f5e, inset 0 0 25px #f43f5e; }
+            0% { box-shadow: 0 0 20px #ec4899, inset 0 0 15px #ec4899; }
+            100% { box-shadow: 0 0 50px #f43f5e, inset 0 0 35px #f43f5e; }
         }
         .crt-overlay {
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.35) 50%);
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.4) 50%);
             background-size: 100% 4px;
             pointer-events: none;
         }
         .btn-arcade {
-            transition: all 0.1s ease;
+            transition: transform 0.05s ease, box-shadow 0.05s ease;
             box-shadow: 0 4px 0 #334155;
         }
         .btn-arcade:active {
             transform: translateY(3px);
             box-shadow: 0 1px 0 #334155;
         }
-        .neon-text-cyan { text-shadow: 0 0 8px #06b6d4, 0 0 18px #06b6d4; }
-        .neon-text-pink { text-shadow: 0 0 8px #ec4899, 0 0 22px #f43f5e; }
-        .neon-text-yellow { text-shadow: 0 0 8px #eab308, 0 0 18px #eab308; }
+        .neon-text-cyan { text-shadow: 0 0 10px #06b6d4, 0 0 20px #06b6d4; }
+        .neon-text-pink { text-shadow: 0 0 10px #ec4899, 0 0 25px #f43f5e; }
+        .neon-text-yellow { text-shadow: 0 0 10px #eab308, 0 0 20px #eab308; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-between p-2 md:p-4 bg-slate-950 overflow-x-hidden">
 
-    <!-- スコア＆フィーバーゲージ ヘッダー -->
+    <!-- ヘッダー UI（スコア / コンボ / ライフ / フィーバーゲージ） -->
     <header class="w-full max-w-lg bg-slate-900/90 border-2 border-slate-700 p-2 md:p-3 rounded-xl shadow-2xl space-y-2 text-[8px] md:text-xs">
         <div class="flex justify-between items-center">
             <div class="text-center">
@@ -66,13 +66,13 @@
             </div>
             <div class="text-center">
                 <span class="text-slate-400 block text-[7px] md:text-[8px] mb-1">LIVES</span>
-                <span id="livesText" class="text-red-400 font-bold">♥♥♥</span>
+                <span id="livesText" class="text-red-400 font-bold tracking-widest">♥♥♥</span>
             </div>
         </div>
 
         <!-- フィーバーゲージバー -->
-        <div class="w-full bg-slate-950 rounded-full border border-slate-700 h-3 overflow-hidden p-0.5 relative">
-            <div id="feverBar" class="h-full rounded-full bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 transition-all duration-150 w-0"></div>
+        <div class="w-full bg-slate-950 rounded-full border border-slate-700 h-3.5 overflow-hidden p-0.5 relative">
+            <div id="feverBar" class="h-full rounded-full bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 transition-all duration-100 w-0"></div>
             <span id="feverLabel" class="absolute inset-0 flex items-center justify-center text-[7px] font-bold text-white tracking-widest drop-shadow">FEVER GAUGE</span>
         </div>
     </header>
@@ -82,25 +82,25 @@
         <div id="arcadeContainer" class="relative arcade-border rounded-xl overflow-hidden bg-slate-950 flex-shrink-0">
             <canvas id="gameCanvas" width="480" height="540" class="block w-full max-w-[480px] aspect-[8/9]"></canvas>
             
-            <!-- CRT風走査線オーバーレイ -->
+            <!-- CRT風走査線 -->
             <div class="absolute inset-0 crt-overlay"></div>
 
-            <!-- フィーバー発動メッセージ -->
-            <div id="feverBanner" class="absolute top-12 left-0 w-full text-center pointer-events-none opacity-0 transition-opacity duration-300">
+            <!-- フィーバー発動バナー -->
+            <div id="feverBanner" class="absolute top-10 left-0 w-full text-center pointer-events-none opacity-0 transition-opacity duration-300">
                 <span class="text-xl md:text-2xl text-pink-500 font-black tracking-widest neon-text-pink animate-bounce block">
                     🔥 FEVER MODE 🔥
                 </span>
-                <span class="text-[9px] text-yellow-300 font-bold tracking-wider">HYPER RAPID SPREAD SHOT!</span>
+                <span class="text-[9px] text-yellow-300 font-bold tracking-wider">TRIPLE SPREAD LASER!</span>
             </div>
 
             <!-- オーバーレイ (スタート / ゲームオーバー / ポーズ) -->
             <div id="overlay" class="absolute inset-0 bg-slate-950/90 flex flex-col items-center justify-center p-4 text-center z-10 transition-all duration-300">
-                <h1 id="overlayTitle" class="text-2xl md:text-3xl text-cyan-400 mb-2 neon-text-cyan tracking-wider">SPACE INVADERS</h1>
+                <h1 id="overlayTitle" class="text-2xl md:text-3xl text-cyan-400 mb-2 neon-text-cyan tracking-wider">NEON INVADERS</h1>
                 <p id="overlaySubtitle" class="text-[9px] md:text-xs text-slate-300 mb-6 leading-relaxed font-sans">
-                    インベーダーを撃破してコンボを稼げ！<br>
-                    ゲージ満タンで激熱の<span class="text-pink-400 font-bold">FEVER MODE</span>突入！
+                    連続でインベーダーを撃破してコンボを稼げ！<br>
+                    ゲージ満タンで<span class="text-pink-400 font-bold">HYPER FEVER MODE</span>突入！
                 </p>
-                <button id="startBtn" class="bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3 px-6 rounded-lg border-2 border-cyan-300 shadow-lg transform active:scale-95 transition text-xs tracking-wider">
+                <button id="startBtn" class="bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3.5 px-8 rounded-lg border-2 border-cyan-300 shadow-lg transform active:scale-95 transition text-xs tracking-wider">
                     GAME START
                 </button>
                 <div class="mt-6 text-[8px] text-slate-400 hidden md:block leading-normal font-sans">
@@ -110,18 +110,19 @@
         </div>
     </main>
 
-    <!-- コントローラー / サウンド・ポーズ -->
+    <!-- サウンド・ポーズ＆スマホ用タッチコントローラー -->
     <footer class="w-full max-w-lg flex flex-col gap-2">
         <div class="flex justify-between items-center gap-2">
             <button id="btnSound" class="bg-slate-800 hover:bg-slate-700 text-slate-300 py-2 px-3 rounded-lg text-[8px] border border-slate-600 btn-arcade flex items-center gap-1">
                 <span id="soundIcon">🔊</span> SOUND
             </button>
+            <div class="text-[8px] text-slate-500 font-sans">WAVE: <span id="waveText" class="text-cyan-400 font-bold">1</span></div>
             <button id="btnPause" class="bg-slate-800 hover:bg-slate-700 text-slate-300 py-2 px-4 rounded-lg text-[8px] border border-slate-600 btn-arcade">
                 PAUSE
             </button>
         </div>
 
-        <!-- スマホ用タッチボタン -->
+        <!-- スマホ用コントローラー -->
         <div class="grid grid-cols-3 gap-2 md:hidden">
             <button id="btnLeft" class="bg-slate-800 active:bg-slate-700 text-slate-200 py-4 rounded-lg border border-slate-600 text-base font-bold btn-arcade select-none touch-none">
                 ◄ LEFT
@@ -169,19 +170,28 @@
                     osc.stop(this.ctx.currentTime + duration);
                 } catch(e){}
             }
-            playShoot() { this.playTone(880, 'square', 0.08, 0.08, true); }
-            playFeverShoot() { this.playTone(1200, 'triangle', 0.06, 0.1, true); }
-            playHit() { this.playTone(180, 'sawtooth', 0.12, 0.15, true); }
-            playPlayerHit() { this.playTone(100, 'sawtooth', 0.4, 0.25, true); }
-            playCombo() {
+            playShoot() { this.playTone(880, 'square', 0.07, 0.08, true); }
+            playFeverShoot() { this.playTone(1300, 'triangle', 0.05, 0.1, true); }
+            playHit() { this.playTone(200, 'sawtooth', 0.1, 0.15, true); }
+            playUfoHit() {
                 if (this.muted || !this.ctx) return;
-                const notes = [523, 659, 783, 1046];
-                notes.forEach((f, idx) => setTimeout(() => this.playTone(f, 'sine', 0.08, 0.08), idx * 40));
+                const notes = [600, 800, 1000, 1200];
+                notes.forEach((f, idx) => setTimeout(() => this.playTone(f, 'sine', 0.08, 0.12), idx * 40));
+            }
+            playPlayerHit() { this.playTone(90, 'sawtooth', 0.4, 0.25, true); }
+            playCombo(count) {
+                if (this.muted || !this.ctx) return;
+                const baseFreq = 440 + Math.min(count, 10) * 50;
+                this.playTone(baseFreq, 'sine', 0.1, 0.09);
             }
             playFeverStart() {
                 if (this.muted || !this.ctx) return;
                 const freqs = [440, 554, 659, 880, 1108, 1318];
-                freqs.forEach((f, idx) => setTimeout(() => this.playTone(f, 'square', 0.12, 0.12), idx * 60));
+                freqs.forEach((f, idx) => setTimeout(() => this.playTone(f, 'square', 0.12, 0.12), idx * 50));
+            }
+            playUFOSound() {
+                if (this.muted || !this.ctx) return;
+                this.playTone(700, 'sine', 0.08, 0.04);
             }
         }
 
@@ -194,7 +204,7 @@
         const H = canvas.height; // 540
 
         // ゲーム状態
-        let gameState = 'START'; // START, PLAYING, PAUSED, GAMEOVER, CLEAR
+        let gameState = 'START'; // START, PLAYING, PAUSED, GAMEOVER
         let score = 0;
         let highScore = parseInt(localStorage.getItem('invader_high_score') || '0', 10);
         let lives = 3;
@@ -205,8 +215,8 @@
         let comboMultiplier = 1;
         let feverGauge = 0; // 0 to 100
         let isFeverMode = false;
-        let feverTimer = 0; // 秒数 countdown
-        const FEVER_MAX_TIME = 7; // 7秒間
+        let feverTimer = 0;
+        const FEVER_MAX_TIME = 7.5; // 7.5秒間
 
         // プレイヤー
         const player = {
@@ -214,28 +224,45 @@
             y: H - 45,
             w: 32,
             h: 18,
-            speed: 5.5,
-            dx: 0,
+            speed: 6.0,
             lastShotTime: 0,
             invulnerableTimer: 0
         };
 
-        // 弾・インベーダー・シェルター・エフェクト配列
+        // UFO（ボーナス敵）
+        let ufo = null;
+        let ufoTimer = 0;
+
+        // 配列管理
         let playerBullets = [];
         let invaderBullets = [];
         let invaders = [];
         let shelters = [];
         let particles = [];
         let floatingTexts = [];
+        let stars = [];
 
-        // インベーダー群移動パラメーター
+        // インベーダー群の移動状態
         let invaderDir = 1;
         let invaderStepTimer = 0;
         let invaderStepInterval = 600; // ms
-        let invaderMoveDown = false;
 
         // キー入力状態
         const keys = { Left: false, Right: false, Fire: false };
+
+        // --- 背景の星の初期化 ---
+        function initStars() {
+            stars = [];
+            for (let i = 0; i < 40; i++) {
+                stars.push({
+                    x: Math.random() * W,
+                    y: Math.random() * H,
+                    size: Math.random() * 2 + 0.5,
+                    speed: Math.random() * 0.8 + 0.2,
+                    alpha: Math.random() * 0.8 + 0.2
+                });
+            }
+        }
 
         // --- インベーダー初期化 ---
         function createInvaders() {
@@ -245,20 +272,20 @@
             const startX = 45;
             const startY = 65;
             const paddingX = 42;
-            const paddingY = 32;
+            const paddingY = 30;
 
             for (let r = 0; r < rows; r++) {
                 for (let c = 0; c < cols; c++) {
-                    let type = 'C'; // Bottom 2 rows
+                    let type = 'C';
                     let pts = 10;
                     let color = '#06b6d4'; // シアン
 
                     if (r === 0) {
-                        type = 'A'; // Top row
+                        type = 'A';
                         pts = 30;
-                        color = '#f43f5e'; // ピンク・レッド
+                        color = '#f43f5e'; // ピンク
                     } else if (r === 1 || r === 2) {
-                        type = 'B'; // Middle rows
+                        type = 'B';
                         pts = 20;
                         color = '#a855f7'; // パープル
                     }
@@ -275,7 +302,8 @@
                     });
                 }
             }
-            invaderStepInterval = Math.max(120, 600 - (wave - 1) * 80);
+            // ウェーブが進むごとに基本速度向上
+            invaderStepInterval = Math.max(100, 550 - (wave - 1) * 70);
         }
 
         // --- トーチカ（シェルター）初期化 ---
@@ -283,15 +311,13 @@
             shelters = [];
             const count = 3;
             const width = 54;
-            const height = 32;
+            const height = 30;
             const gap = (W - (count * width)) / (count + 1);
 
             for (let i = 0; i < count; i++) {
                 const sx = gap + i * (width + gap);
                 const sy = H - 110;
                 
-                // シェルターを細かいブロック要素で構成
-                const blocks = [];
                 const rows = 4;
                 const cols = 6;
                 const bw = width / cols;
@@ -299,9 +325,8 @@
 
                 for (let r = 0; r < rows; r++) {
                     for (let c = 0; c < cols; c++) {
-                        // 中央下部をアーチ状に繰り抜く
-                        if (r >= 2 && (c === 2 || c === 3)) continue;
-                        blocks.push({
+                        if (r >= 2 && (c === 2 || c === 3)) continue; // アーチ抜き
+                        shelters.push({
                             x: sx + c * bw,
                             y: sy + r * bh,
                             w: bw,
@@ -310,7 +335,6 @@
                         });
                     }
                 }
-                shelters.push(...blocks);
             }
         }
 
@@ -323,7 +347,7 @@
         function createExplosion(x, y, color, count = 12) {
             for (let i = 0; i < count; i++) {
                 const angle = Math.random() * Math.PI * 2;
-                const speed = 1 + Math.random() * 4;
+                const speed = 1 + Math.random() * 4.5;
                 particles.push({
                     x: x,
                     y: y,
@@ -332,7 +356,7 @@
                     size: 2 + Math.random() * 3,
                     color: color,
                     alpha: 1,
-                    decay: 0.03 + Math.random() * 0.03
+                    decay: 0.025 + Math.random() * 0.025
                 });
             }
         }
@@ -344,47 +368,43 @@
                 y: y,
                 color: color,
                 alpha: 1,
-                vy: -1
+                vy: -1.2
             });
         }
 
         // --- プレイヤーショット ---
         function shootPlayerBullet() {
             const now = performance.now();
-            const cooldown = isFeverMode ? 90 : 250; // フィーバー中は超高速連射
+            const cooldown = isFeverMode ? 85 : 240;
 
             if (now - player.lastShotTime < cooldown) return;
             player.lastShotTime = now;
 
             if (isFeverMode) {
-                // フィーバー時：3方向拡散ショット
                 sound.playFeverShoot();
-                playerBullets.push({ x: player.x + player.w / 2 - 2, y: player.y, vx: 0, vy: -9, color: '#ec4899' });
-                playerBullets.push({ x: player.x + player.w / 2 - 2, y: player.y, vx: -2.2, vy: -8.5, color: '#ec4899' });
-                playerBullets.push({ x: player.x + player.w / 2 - 2, y: player.y, vx: 2.2, vy: -8.5, color: '#ec4899' });
+                // 3方向ショット
+                playerBullets.push({ x: player.x + player.w / 2 - 2, y: player.y, vx: 0, vy: -9.5, color: '#ec4899' });
+                playerBullets.push({ x: player.x + player.w / 2 - 2, y: player.y, vx: -2.4, vy: -9.0, color: '#ec4899' });
+                playerBullets.push({ x: player.x + player.w / 2 - 2, y: player.y, vx: 2.4, vy: -9.0, color: '#ec4899' });
             } else {
-                // 通常時：単発レーザー（画面上最大2発制限）
                 if (playerBullets.length >= 2) return;
                 sound.playShoot();
-                playerBullets.push({ x: player.x + player.w / 2 - 2, y: player.y, vx: 0, vy: -7, color: '#38bdf8' });
+                playerBullets.push({ x: player.x + player.w / 2 - 2, y: player.y, vx: 0, vy: -7.5, color: '#38bdf8' });
             }
         }
 
-        // --- フィーバーモード発動 ---
+        // --- フィーバー制御 ---
         function activateFever() {
             isFeverMode = true;
             feverTimer = FEVER_MAX_TIME;
             feverGauge = 100;
             sound.playFeverStart();
-            triggerScreenShake(20);
+            triggerScreenShake(22);
 
-            const arcadeBox = document.getElementById('arcadeContainer');
-            arcadeBox.classList.add('fever-border');
+            document.getElementById('arcadeContainer').classList.add('fever-border');
+            document.getElementById('feverBanner').classList.remove('opacity-0');
 
-            const banner = document.getElementById('feverBanner');
-            banner.classList.remove('opacity-0');
-
-            addFloatingText('🔥 FEVER START! 🔥', W / 2 - 60, H / 2, '#ec4899');
+            addFloatingText('🔥 HYPER FEVER MODE! 🔥', W / 2 - 100, H / 2, '#ec4899');
         }
 
         function deactivateFever() {
@@ -398,17 +418,21 @@
         // --- ゲームループ & 更新 ---
         let lastTime = 0;
         function update(time = 0) {
-            const dt = (time - lastTime) / 1000;
+            const dt = Math.min((time - lastTime) / 1000, 0.1);
             lastTime = time;
 
             if (gameState === 'PLAYING') {
-                // フィーバータイマーの減衰処理
+                // 星の移動
+                stars.forEach(s => {
+                    s.y += s.speed;
+                    if (s.y > H) s.y = 0;
+                });
+
+                // フィーバータイマー
                 if (isFeverMode) {
                     feverTimer -= dt;
                     feverGauge = Math.max(0, (feverTimer / FEVER_MAX_TIME) * 100);
-                    if (feverTimer <= 0) {
-                        deactivateFever();
-                    }
+                    if (feverTimer <= 0) deactivateFever();
                 }
 
                 // プレイヤー移動
@@ -418,21 +442,42 @@
 
                 if (keys.Fire) shootPlayerBullet();
 
-                // 無敵時間カウント
-                if (player.invulnerableTimer > 0) {
-                    player.invulnerableTimer -= dt;
+                if (player.invulnerableTimer > 0) player.invulnerableTimer -= dt;
+
+                // --- UFOのスポーンと移動 ---
+                ufoTimer += dt;
+                if (!ufo && ufoTimer > 12) { // 12秒ごとに確率で出現
+                    if (Math.random() < 0.6) {
+                        const dir = Math.random() < 0.5 ? 1 : -1;
+                        ufo = {
+                            x: dir === 1 ? -30 : W + 30,
+                            y: 35,
+                            w: 32,
+                            h: 16,
+                            speed: dir * 2.2,
+                            pts: 150
+                        };
+                    }
+                    ufoTimer = 0;
                 }
 
-                // プレイヤー弾更新
+                if (ufo) {
+                    ufo.x += ufo.speed;
+                    if (Math.random() < 0.05) sound.playUFOSound();
+                    if ((ufo.speed > 0 && ufo.x > W + 40) || (ufo.speed < 0 && ufo.x < -40)) {
+                        ufo = null;
+                    }
+                }
+
+                // --- プレイヤー弾更新 ---
                 for (let i = playerBullets.length - 1; i >= 0; i--) {
                     const b = playerBullets[i];
                     b.x += b.vx;
                     b.y += b.vy;
 
-                    // 画面外到達（コンボリセット判断）
+                    // 画面外
                     if (b.y < 0 || b.x < 0 || b.x > W) {
                         playerBullets.splice(i, 1);
-                        // フィーバー中でない場合のみ失砲でコンボリセット
                         if (!isFeverMode) {
                             comboCount = 0;
                             comboMultiplier = 1;
@@ -441,20 +486,36 @@
                         continue;
                     }
 
-                    // 弾 vs インベーダー 衝突判定
-                    let hitInvader = false;
+                    // 弾 vs UFO
+                    if (ufo && b.x > ufo.x && b.x < ufo.x + ufo.w && b.y > ufo.y && b.y < ufo.y + ufo.h) {
+                        sound.playUfoHit();
+                        createExplosion(ufo.x + ufo.w / 2, ufo.y + ufo.h / 2, '#ef4444', 18);
+                        triggerScreenShake(10);
+                        score += ufo.pts * comboMultiplier;
+                        addFloatingText(`UFO +${ufo.pts * comboMultiplier}!`, ufo.x, ufo.y, '#f43f5e');
+                        ufo = null;
+                        playerBullets.splice(i, 1);
+
+                        if (!isFeverMode) {
+                            feverGauge = Math.min(100, feverGauge + 35);
+                            if (feverGauge >= 100) activateFever();
+                        }
+                        updateUI();
+                        continue;
+                    }
+
+                    // 弾 vs インベーダー
+                    let hit = false;
                     for (let j = invaders.length - 1; j >= 0; j--) {
                         const inv = invaders[j];
                         if (b.x > inv.x && b.x < inv.x + inv.w && b.y > inv.y && b.y < inv.y + inv.h) {
-                            // 撃破成功！
                             sound.playHit();
                             createExplosion(inv.x + inv.w / 2, inv.y + inv.h / 2, inv.color);
-                            triggerScreenShake(6);
+                            triggerScreenShake(5);
 
-                            // スコア ＆ コンボ計算
                             comboCount++;
-                            comboMultiplier = Math.min(10, 1 + Math.floor(comboCount / 3));
-                            if (comboCount % 3 === 0) sound.playCombo();
+                            comboMultiplier = Math.min(10, 1 + Math.floor(comboCount / 2));
+                            sound.playCombo(comboCount);
 
                             const feverBonus = isFeverMode ? 2 : 1;
                             const ptsGained = inv.pts * comboMultiplier * feverBonus;
@@ -462,17 +523,14 @@
 
                             addFloatingText(`+${ptsGained}${comboMultiplier > 1 ? ` (x${comboMultiplier})` : ''}`, inv.x, inv.y, inv.color);
 
-                            // フィーバーゲージ蓄積（非フィーバー時）
                             if (!isFeverMode) {
-                                feverGauge = Math.min(100, feverGauge + 8);
-                                if (feverGauge >= 100) {
-                                    activateFever();
-                                }
+                                feverGauge = Math.min(100, feverGauge + 7);
+                                if (feverGauge >= 100) activateFever();
                             }
 
                             invaders.splice(j, 1);
                             playerBullets.splice(i, 1);
-                            hitInvader = true;
+                            hit = true;
 
                             if (score > highScore) {
                                 highScore = score;
@@ -483,9 +541,9 @@
                         }
                     }
 
-                    if (hitInvader) continue;
+                    if (hit) continue;
 
-                    // 弾 vs シェルター 衝突判定
+                    // 弾 vs シェルター
                     for (let k = shelters.length - 1; k >= 0; k--) {
                         const sh = shelters[k];
                         if (b.x > sh.x && b.x < sh.x + sh.w && b.y > sh.y && b.y < sh.y + sh.h) {
@@ -498,16 +556,18 @@
                     }
                 }
 
-                // インベーダー群の移動処理
+                // --- インベーダー移動（残数が減ると加速） ---
+                const remainingRatio = invaders.length / 40;
+                const dynamicInterval = (isFeverMode ? invaderStepInterval * 1.1 : invaderStepInterval) * Math.max(0.2, remainingRatio);
+
                 invaderStepTimer += dt * 1000;
-                if (invaderStepTimer >= (isFeverMode ? invaderStepInterval * 1.2 : invaderStepInterval)) {
+                if (invaderStepTimer >= dynamicInterval) {
                     invaderStepTimer = 0;
 
-                    // 端到達チェック
                     let reachEdge = false;
                     for (let inv of invaders) {
-                        inv.frame = inv.frame === 0 ? 1 : 0; // アニメーション切り替え
-                        if ((invaderDir === 1 && inv.x + inv.w >= W - 15) || (invaderDir === -1 && inv.x <= 15)) {
+                        inv.frame = inv.frame === 0 ? 1 : 0;
+                        if ((invaderDir === 1 && inv.x + inv.w >= W - 12) || (invaderDir === -1 && inv.x <= 12)) {
                             reachEdge = true;
                         }
                     }
@@ -515,35 +575,31 @@
                     if (reachEdge) {
                         invaderDir *= -1;
                         for (let inv of invaders) {
-                            inv.y += 14;
-                            // プレイヤー位置に侵略されたら即ゲームオーバー
-                            if (inv.y + inv.h >= player.y) {
-                                triggerGameOver();
-                            }
+                            inv.y += 12;
+                            if (inv.y + inv.h >= player.y) triggerGameOver();
                         }
                     } else {
                         for (let inv of invaders) {
-                            inv.x += invaderDir * 8;
+                            inv.x += invaderDir * 7;
                         }
                     }
 
-                    // 敵弾の発射（一定確率）
+                    // 敵の攻撃
                     if (invaders.length > 0 && Math.random() < 0.35 + wave * 0.05) {
-                        const randomInvader = invaders[Math.floor(Math.random() * invaders.length)];
+                        const shooter = invaders[Math.floor(Math.random() * invaders.length)];
                         invaderBullets.push({
-                            x: randomInvader.x + randomInvader.w / 2,
-                            y: randomInvader.y + randomInvader.h,
-                            vy: 3.5 + wave * 0.4
+                            x: shooter.x + shooter.w / 2,
+                            y: shooter.y + shooter.h,
+                            vy: 3.6 + wave * 0.35
                         });
                     }
                 }
 
-                // 敵弾更新
+                // --- 敵弾更新 ---
                 for (let i = invaderBullets.length - 1; i >= 0; i--) {
                     const eb = invaderBullets[i];
                     eb.y += eb.vy;
 
-                    // 画面外
                     if (eb.y > H) {
                         invaderBullets.splice(i, 1);
                         continue;
@@ -564,42 +620,40 @@
                     }
                     if (hitShelter) continue;
 
-                    // 敵弾 vs プレイヤー（無敵時間外かつ非フィーバー時ダメージ、フィーバー時は弾弾き）
+                    // 敵弾 vs プレイヤー
                     if (eb.x > player.x && eb.x < player.x + player.w && eb.y > player.y && eb.y < player.y + player.h) {
                         invaderBullets.splice(i, 1);
 
                         if (isFeverMode) {
-                            // フィーバー中は弾を跳ね返す演出
+                            // フィーバー中はガード
                             sound.playHit();
-                            createExplosion(eb.x, eb.y, '#ec4899', 6);
-                            addFloatingText('BLOCK!', eb.x, eb.y - 10, '#ec4899');
+                            createExplosion(eb.x, eb.y, '#ec4899', 8);
+                            addFloatingText('REFLECT!', eb.x, eb.y - 12, '#ec4899');
                         } else if (player.invulnerableTimer <= 0) {
-                            // 被弾処理
                             lives--;
                             comboCount = 0;
                             comboMultiplier = 1;
                             sound.playPlayerHit();
-                            createExplosion(player.x + player.w / 2, player.y + player.h / 2, '#ef4444', 20);
+                            createExplosion(player.x + player.w / 2, player.y + player.h / 2, '#ef4444', 22);
                             triggerScreenShake(18);
-                            player.invulnerableTimer = 2.0; // 2秒無敵
+                            player.invulnerableTimer = 2.0;
                             updateUI();
 
-                            if (lives <= 0) {
-                                triggerGameOver();
-                            }
+                            if (lives <= 0) triggerGameOver();
                         }
                     }
                 }
 
-                // ウェーブクリア判定
+                // 次のウェーブ
                 if (invaders.length === 0) {
                     wave++;
-                    addFloatingText(`WAVE ${wave} START!`, W / 2 - 50, H / 2, '#38bdf8');
+                    addFloatingText(`WAVE ${wave} CLEAR!`, W / 2 - 60, H / 2, '#38bdf8');
                     createInvaders();
                     createShelters();
+                    updateUI();
                 }
 
-                // パーティクル & テキスト更新
+                // エフェクト更新
                 particles.forEach((p, idx) => {
                     p.x += p.vx;
                     p.y += p.vy;
@@ -622,7 +676,6 @@
         function draw() {
             ctx.save();
 
-            // 画面シェイク適用
             if (shakeTime > 0) {
                 const rx = (Math.random() - 0.5) * shakeTime;
                 const ry = (Math.random() - 0.5) * shakeTime;
@@ -630,11 +683,17 @@
                 shakeTime--;
             }
 
-            // 背景描画（フィーバー時は背景がうっすらピンクに発光）
-            ctx.fillStyle = isFeverMode ? '#1e0a1d' : '#030712';
+            // 背景描画
+            ctx.fillStyle = isFeverMode ? '#1e0924' : '#030712';
             ctx.fillRect(0, 0, W, H);
 
-            // 背景グリッド（レトロ感）
+            // 背景の星
+            stars.forEach(s => {
+                ctx.fillStyle = `rgba(255, 255, 255, ${s.alpha})`;
+                ctx.fillRect(s.x, s.y, s.size, s.size);
+            });
+
+            // 背景グリッド
             ctx.strokeStyle = isFeverMode ? 'rgba(236, 72, 153, 0.08)' : 'rgba(6, 182, 212, 0.04)';
             ctx.lineWidth = 1;
             for (let x = 0; x < W; x += 30) {
@@ -647,12 +706,20 @@
                 ctx.fillRect(sh.x, sh.y, sh.w - 0.5, sh.h - 0.5);
             });
 
-            // インベーダー描画（ドット絵風アイコン）
+            // UFO描画
+            if (ufo) {
+                ctx.fillStyle = '#ef4444';
+                ctx.fillRect(ufo.x + 4, ufo.y + 4, ufo.w - 8, ufo.h - 8);
+                ctx.fillRect(ufo.x + 8, ufo.y, ufo.w - 16, 4);
+                ctx.fillStyle = '#fef08a';
+                ctx.fillRect(ufo.x + 6, ufo.y + 6, 4, 4);
+                ctx.fillRect(ufo.x + 22, ufo.y + 6, 4, 4);
+            }
+
+            // インベーダー描画
             invaders.forEach(inv => {
                 ctx.fillStyle = inv.color;
-                // 本体ベース
                 ctx.fillRect(inv.x + 4, inv.y + 4, inv.w - 8, inv.h - 6);
-                // 目・触角の演出
                 ctx.fillRect(inv.x + (inv.frame === 0 ? 2 : 0), inv.y + 2, 4, 4);
                 ctx.fillRect(inv.x + inv.w - (inv.frame === 0 ? 6 : 4), inv.y + 2, 4, 4);
                 ctx.fillRect(inv.x + 6, inv.y + inv.h - 4, 4, 4);
@@ -660,15 +727,14 @@
             });
 
             // プレイヤー描画（無敵時点滅）
-            if (player.invulnerableTimer <= 0 || Math.floor(performance.now() / 100) % 2 === 0) {
+            if (player.invulnerableTimer <= 0 || Math.floor(performance.now() / 80) % 2 === 0) {
                 ctx.fillStyle = isFeverMode ? '#ec4899' : '#38bdf8';
-                // 戦闘機キャノピー型
                 ctx.fillRect(player.x, player.y + 8, player.w, player.h - 8);
                 ctx.fillRect(player.x + player.w / 2 - 4, player.y, 8, 8);
                 ctx.fillRect(player.x + 2, player.y + 4, player.w - 4, 4);
             }
 
-            // プレイヤー弾描画
+            // 弾描画
             playerBullets.forEach(b => {
                 ctx.fillStyle = b.color;
                 ctx.shadowColor = b.color;
@@ -677,7 +743,6 @@
                 ctx.shadowBlur = 0;
             });
 
-            // 敵弾描画
             ctx.fillStyle = '#f43f5e';
             invaderBullets.forEach(eb => {
                 ctx.fillRect(eb.x - 1.5, eb.y, 3, 8);
@@ -691,7 +756,7 @@
             });
             ctx.globalAlpha = 1.0;
 
-            // フローティングテキスト描画
+            // フローティングテキスト
             floatingTexts.forEach(ft => {
                 ctx.font = '10px "Press Start 2P"';
                 ctx.fillStyle = ft.color;
@@ -709,12 +774,13 @@
             document.getElementById('highScoreText').innerText = String(highScore).padStart(6, '0');
             document.getElementById('comboText').innerText = `x${comboMultiplier}`;
             document.getElementById('livesText').innerText = '♥'.repeat(Math.max(0, lives));
+            document.getElementById('waveText').innerText = wave;
 
             const feverBar = document.getElementById('feverBar');
             feverBar.style.width = `${feverGauge}%`;
         }
 
-        // --- ゲーム状態制御 ---
+        // --- ゲーム状態管理 ---
         function resetGame() {
             score = 0;
             lives = 3;
@@ -722,6 +788,8 @@
             comboCount = 0;
             comboMultiplier = 1;
             feverGauge = 0;
+            ufo = null;
+            ufoTimer = 0;
             deactivateFever();
             playerBullets = [];
             invaderBullets = [];
@@ -729,6 +797,7 @@
             floatingTexts = [];
             player.x = W / 2 - 16;
             player.invulnerableTimer = 0;
+            initStars();
             createInvaders();
             createShelters();
             updateUI();
@@ -774,25 +843,43 @@
         }
 
         // --- イベントリスナー ---
-        document.getElementById('startBtn').addEventListener('click', () => {
+        document.getElementById('startBtn').addEventListener('click', (e) => {
+            if (e && e.target) e.target.blur(); // フォーカスを解除してSpaceキー等での誤発火を防止
             if (gameState === 'PAUSED') togglePause();
             else startGame();
         });
 
-        document.getElementById('btnPause').addEventListener('click', togglePause);
-        document.getElementById('btnSound').addEventListener('click', () => {
+        document.getElementById('btnPause').addEventListener('click', (e) => {
+            if (e && e.target) e.target.blur();
+            togglePause();
+        });
+
+        document.getElementById('btnSound').addEventListener('click', (e) => {
+            if (e && e.target) e.target.blur();
             const isMuted = sound.toggleMute();
             document.getElementById('soundIcon').innerText = isMuted ? '🔇' : '🔊';
         });
 
-        // キーボード操作
+        // キーボードコントロール
         window.addEventListener('keydown', (e) => {
-            if (e.code === 'KeyP') togglePause();
+            if (e.code === 'KeyP') {
+                e.preventDefault();
+                togglePause();
+            }
             if (gameState !== 'PLAYING') return;
 
-            if (e.code === 'ArrowLeft' || e.code === 'KeyA') keys.Left = true;
-            if (e.code === 'ArrowRight' || e.code === 'KeyD') keys.Right = true;
-            if (e.code === 'Space' || e.code === 'KeyK') keys.Fire = true;
+            if (e.code === 'ArrowLeft' || e.code === 'KeyA') {
+                e.preventDefault();
+                keys.Left = true;
+            }
+            if (e.code === 'ArrowRight' || e.code === 'KeyD') {
+                e.preventDefault();
+                keys.Right = true;
+            }
+            if (e.code === 'Space' || e.code === 'KeyK') {
+                e.preventDefault(); // フォーカス要素の誤クリックや画面スクロールを防止
+                keys.Fire = true;
+            }
         });
 
         window.addEventListener('keyup', (e) => {
@@ -801,7 +888,7 @@
             if (e.code === 'Space' || e.code === 'KeyK') keys.Fire = false;
         });
 
-        // タッチ操作割り当て
+        // タッチ操作割当
         const bindTouch = (id, keyName) => {
             const el = document.getElementById(id);
             if (!el) return;
@@ -817,8 +904,9 @@
         bindTouch('btnRight', 'Right');
         bindTouch('btnFire', 'Fire');
 
-        // 起動処理
+        // 起動時
         window.onload = () => {
+            initStars();
             updateUI();
             requestAnimationFrame(update);
         };
